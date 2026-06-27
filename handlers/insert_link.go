@@ -1,15 +1,15 @@
 package handlers
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hcivekhsim/links-hub/models"
+	"github.com/hcivekhsim/links-hub/repository"
 )
 
-func InsertLink(db *sql.DB) gin.HandlerFunc {
+func InsertLink(repo repository.LinkRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		link := models.Link{}
 
@@ -18,11 +18,7 @@ func InsertLink(db *sql.DB) gin.HandlerFunc {
 			return
 		}
 
-		query := `INSERT INTO links (title, url, description) 
-		VALUES ($1, $2, $3) RETURNING id `
-
-		var id int
-		err := db.QueryRow(query, link.Title, link.URL, link.Desc).Scan(&id)
+		id, err := repo.AddLink(c.Request.Context(), link)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create link in BD"})
 			return

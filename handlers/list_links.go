@@ -2,35 +2,24 @@
 package handlers
 
 import (
-	"database/sql"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/hcivekhsim/links-hub/models"
+	"github.com/hcivekhsim/links-hub/repository"
 )
 
 // GetLinks DI func
-func GetLinks(db *sql.DB) gin.HandlerFunc {
+func GetLinks(repo repository.LinkRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		links := []models.Link{}
-
-		rows, err := db.QueryContext(c.Request.Context(), "SELECT id, title, url, description, created_at, updated_at FROM  links")
+		links, err := repo.GetAll(c.Request.Context())
 		if err != nil {
-			log.Fatal("err_select")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+			return
 		}
-
-		defer rows.Close()
-
-		for rows.Next() {
-			l := models.Link{}
-
-			err := rows.Scan(&l.ID, &l.Title, &l.URL, &l.Desc, &l.CreatedAt, &l.UpdatedAt)
-			if err != nil {
-				log.Fatal("err_scan")
-			}
-			links = append(links, l)
+		if links == nil {
+			links = []models.Link{}
 		}
 
 		c.IndentedJSON(http.StatusOK, links)
