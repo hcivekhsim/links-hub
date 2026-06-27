@@ -2,11 +2,13 @@ package main
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/hcivekhsim/links-hub/handlers"
 	"github.com/hcivekhsim/links-hub/pkg"
+	"github.com/hcivekhsim/links-hub/repository"
 )
 
 func main() {
@@ -18,13 +20,22 @@ func main() {
 
 	defer db.Close()
 
+	linkRepo := repository.NewPostgresRepo(db)
+
 	log.Println("DB work")
+
 	r := gin.Default()
 
-	r.GET("/links", handlers.GetLinks(db))
-	r.POST("/links", handlers.InsertLink(db))
-	r.PUT("/links", handlers.UpdateLink(db))
-	r.DELETE("/links/:id", handlers.DeleteLink(db))
+	r.LoadHTMLGlob("components/*")
+
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
+	})
+
+	r.GET("/links", handlers.GetLinks(linkRepo))
+	r.POST("/links", handlers.InsertLink(linkRepo))
+	r.PUT("/links", handlers.UpdateLink(linkRepo))
+	r.DELETE("/links/:id", handlers.DeleteLink(linkRepo))
 
 	if err := r.Run(); err != nil {
 		log.Fatalf("failed to run server: %w", err)
