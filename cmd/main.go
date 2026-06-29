@@ -26,21 +26,15 @@ func main() {
 
 	r := gin.Default()
 
-<<<<<<< HEAD
+
 	r.LoadHTMLFiles("components/index.html")
 
 	r.Static("/css", "./components/css")
 	r.Static("/font", "./components/font")
 	r.Static("/js", "./components/js")
-=======
-	r.LoadHTMLGlob("components/html/*")
-
-	r.Static("css/", "components/css/")
-	r.Static("font/", "components/font/")
->>>>>>> origin/main
 
 	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "html/index.html", nil)
+		c.HTML(http.StatusOK, "index.html", nil)
 	})
 
 	r.GET("/links/", handlers.GetLinks(linkRepo))
