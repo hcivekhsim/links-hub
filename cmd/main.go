@@ -26,15 +26,18 @@ func main() {
 
 	r := gin.Default()
 
-	r.LoadHTMLGlob("components/*")
+	r.LoadHTMLGlob("components/html/*")
+
+	r.Static("css/", "components/css/")
+	r.Static("font/", "components/font/")
 
 	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", nil)
+		c.HTML(http.StatusOK, "html/index.html", nil)
 	})
 
-	r.GET("/links", handlers.GetLinks(linkRepo))
-	r.POST("/links", handlers.InsertLink(linkRepo))
-	r.PUT("/links", handlers.UpdateLink(linkRepo))
+	r.GET("/links/", handlers.GetLinks(linkRepo))
+	r.POST("/links/", handlers.InsertLink(linkRepo))
+	r.PUT("/links/", handlers.UpdateLink(linkRepo))
 	r.DELETE("/links/:id", handlers.DeleteLink(linkRepo))
 
 	if err := r.Run(); err != nil {
