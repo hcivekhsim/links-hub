@@ -26,6 +26,7 @@ func main() {
 
 	r := gin.Default()
 
+
 	r.LoadHTMLFiles("components/index.html")
 
 	r.Static("/css", "./components/css")
